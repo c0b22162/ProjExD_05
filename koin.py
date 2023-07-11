@@ -1,78 +1,82 @@
-import pygame
+import pygame as pg
 import random
+import sys
 
-# ゲーム初期化
-pygame.init()
+WIDTH = 800  # ゲームウィンドウの幅
+HEIGHT = 600  # ゲームウィンドウの高さ
 
-# ウィンドウサイズ
-screen_width = 800
-screen_height = 600
 
-# 色
-WHITE = (255, 255, 255)
-YELLOW = (255, 255, 0)
+def main():
 
-# ウィンドウを作る
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("COIN GETTER")
+    # 色
+    WHITE = (255, 255, 255)
+    YELLOW = (255, 255, 0)
 
-# player初期位置
-player_x = 400
-player_y = 500
+    # ウィンドウを作る
+    screen = pg.display.set_mode((WIDTH, HEIGHT))
+    pg.display.set_caption("coin getter")
 
-# player
-player = pygame.Rect(player_x, player_y, 50, 50)
+    # player初期位置
+    player_x = 400
+    player_y = 500
 
-# コインを作る
-coins = []
-for i in range(10):
-    x = random.randint(0, screen_width - 50)
-    y = random.randint(-screen_height, -50)
-    coin = pygame.Rect(x, y, 50, 50)
-    coins.append(coin)
+    # player
+    player = pg.Rect(player_x, player_y, 50, 50)
 
-# スコア初期値
-score = 0
+    # コインを作る
+    coins = []
+    for i in range(10):
+        x = random.randint(0, WIDTH - 50)
+        y = random.randint(-HEIGHT, -50)
+        coin = pg.Rect(x, y, 50, 50)
+        coins.append(coin)
 
-# main循環
-running = True
-while running:
-    
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+    # スコア初期値
+    score = 0
 
-    # player移動
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        player.x -= 5
-    if keys[pygame.K_RIGHT]:
-        player.x += 5
+    # main循環
+    while True:
+        
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                return 0
 
-    # ウィンドウ更新
-    screen.fill(WHITE)
-    pygame.draw.rect(screen, YELLOW, player)
+        # player移動
+        keys = pg.key.get_pressed()
+        if keys[pg.K_LEFT]:
+            player.x -= 5
+        if keys[pg.K_RIGHT]:
+            player.x += 5
 
-    # コインの位置を更新
-    for coin in coins:
-        coin.y += 2
-        pygame.draw.ellipse(screen, YELLOW, coin)
+        # ウィンドウ更新
+        screen.fill(WHITE)
+        pg.draw.rect(screen, YELLOW, player)
 
-        # 衝突検出
-        if player.colliderect(coin):
-            coins.remove(coin)
-            score += 1
+        # コインの位置を更新
+        for coin in coins:
+            coin.y += 1
+            pg.draw.ellipse(screen, YELLOW, coin)
 
-        # コインを再生する
-        if coin.y > screen_height:
-            coin.x = random.randint(0, screen_width - 50)
-            coin.y = random.randint(-screen_height, -50)
+            # 衝突検出
+            if player.colliderect(coin):
+                coins.remove(coin)
+                score += 1
 
-    # スコア
-    font = pygame.font.Font(None, 36)
-    text = font.render("Score: " + str(score), True, YELLOW)
-    screen.blit(text, (10, 10))
+            # コインを再生する
+            if coin.y > HEIGHT:
+                coin.x = random.randint(0, WIDTH - 50)
+                coin.y = random.randint(-HEIGHT, -50)
 
-    pygame.display.flip()
+        # スコア
+        font = pg.font.Font(None, 36)
+        text = font.render("Score: " + str(score), True, YELLOW)
+        screen.blit(text, (10, 10))
 
-pygame.quit()
+        pg.display.flip()
+
+
+if __name__ == "__main__":
+    pg.init()
+    main()
+    pg.quit()
+    sys.exit()
