@@ -20,8 +20,7 @@ def main():
     # player初期位置
     player_x = 400
     player_y = 500
-
-    #test
+    # commit
 
     # player　画像に変更
     player = pg.image.load("ex05/usi.png")
