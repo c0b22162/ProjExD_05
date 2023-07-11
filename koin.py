@@ -2,34 +2,58 @@ import pygame as pg
 import random
 import sys
 
-WIDTH = 800  # ゲームウィンドウの幅
-HEIGHT = 600  # ゲームウィンドウの高さ
-
+# ゲームウィンドウの幅
+WIDTH = 800
+# ゲームウィンドウの高さ
+HEIGHT = 600
 
 def main():
 
-    # 色
+    # 色の設定
     WHITE = (255, 255, 255)
     YELLOW = (255, 255, 0)
+    BLUE = (0 ,0 ,255)
+    RED = (255, 0, 0)
 
     # ウィンドウを作る
     screen = pg.display.set_mode((WIDTH, HEIGHT))
+    # ゲームの名前
     pg.display.set_caption("coin getter")
 
-    # player初期位置
+    # playerの初期位置と大きさ
     player_x = 400
     player_y = 500
 
-    # player
     player = pg.Rect(player_x, player_y, 50, 50)
 
     # コインを作る
     coins = []
+
+    # スーパーコインを作る
+    super_coins=[]
+
+    # 防壁の初期状態（初めは存在しない）
+    wall = None
+    # 防壁の存在状態
+    wall_exists = False
+
+    # コインを10個入れる
     for i in range(10):
+        # コインの生成位置をランダムにする
+        # コインを画面の上端で生成する
         x = random.randint(0, WIDTH - 50)
         y = random.randint(-HEIGHT, -50)
         coin = pg.Rect(x, y, 50, 50)
         coins.append(coin)
+
+    #スーパーコインを3個を入れる
+    for j in range(3):
+        # スーパーコインの生成位置をランダムにする
+        # スーパーコインを上から降ろすにする
+        x = random.randint(0, WIDTH - 50)
+        y = random.randint(-HEIGHT, -50)
+        super_coin = pg.Rect(x, y, 25, 25)
+        super_coins.append(super_coin)
 
     # スコア初期値
     score = 0
@@ -40,8 +64,18 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return 0
+            
+            # Tabを押すと防壁の存在状態をスウィッチする
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_TAB:
+                    if wall_exists:
+                        wall_exists = False
+                    else:
+                        # 防壁の形とplayerに対する位置
+                        wall = pg.Rect(player.left, player.top - 25, player.width, 25)
+                        wall_exists = True
 
-        # player移動
+        # playerの移動と移動速度
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT]:
             player.x -= 5
@@ -54,26 +88,56 @@ def main():
 
         # コインの位置を更新
         for coin in coins:
+            # コインを上から落ちることにする
             coin.y += 1
             pg.draw.ellipse(screen, YELLOW, coin)
 
             # 衝突検出
+            # playerと重なったら、コインが消えて、スコアを1点クラス
             if player.colliderect(coin):
                 coins.remove(coin)
                 score += 1
 
-            # コインを再生する
+            # コインの再生位置
+            # コインが画面外に出たら（playerと重なってない）、コインを画面の上端に再生成する
             if coin.y > HEIGHT:
                 coin.x = random.randint(0, WIDTH - 50)
                 coin.y = random.randint(-HEIGHT, -50)
 
-        # スコア
+        # スーパーコインの位置の更新
+        for super_coin in super_coins:
+            # スーパーコインを上から落ちることにする
+            # コインの2倍の速さで落ちることにする
+            super_coin.y += 2
+            pg.draw.ellipse(screen, BLUE, super_coin)
+
+            #　衝突検出
+            # playerと重なったら、スーパーコインが消えて、スコアを2点クラス
+            if player.colliderect(super_coin):
+                super_coins.remove(super_coin)
+                score += 2
+
+            # スーパーコインの再生位置
+            if super_coin.y > HEIGHT:
+                # コインが画面外に出たら（playerと重なってない）、スーパーコインを画面の上端に再生成する
+                super_coin.x = random.randint(0, WIDTH - 50)
+                super_coin.y = random.randint(-HEIGHT, -50)
+
+        # 防壁に色をつけて画面に表示する
+        if wall_exists:
+            pg.draw.rect(screen, RED, wall)
+
+        # コインが防壁と重なったら、コインが消える
+            for coin in coins[:]:
+                if wall.colliderect(coin):
+                    coins.remove(coin)
+
+        # スコアの表示
         font = pg.font.Font(None, 36)
         text = font.render("Score: " + str(score), True, YELLOW)
         screen.blit(text, (10, 10))
 
         pg.display.flip()
-
 
 if __name__ == "__main__":
     pg.init()
