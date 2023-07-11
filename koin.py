@@ -11,6 +11,7 @@ def main():
     # 色
     WHITE = (255, 255, 255)
     YELLOW = (255, 255, 0)
+    BLACK = (0, 0, 0)
 
     # ウィンドウを作る
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -21,8 +22,9 @@ def main():
     player_y = 500
 
     # player
-    player = pg.Rect(player_x, player_y, 50, 50)
-
+    player = pg.image.load("ex05/usi.png")
+    player_rect = player.get_rect()
+    player_rect.center = (player_x,player_y)
     # コインを作る
     coins = []
     for i in range(10):
@@ -44,13 +46,19 @@ def main():
         # player移動
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT]:
-            player.x -= 5
+            if player_rect.left > 0:
+                player_rect.x -= 2
+            else:
+                player_rect.x = 0
         if keys[pg.K_RIGHT]:
-            player.x += 5
+            if player_rect.right < WIDTH:
+                player_rect.x += 2
+            else:
+                player_rect.x = WIDTH - player_rect.width
 
         # ウィンドウ更新
         screen.fill(WHITE)
-        pg.draw.rect(screen, YELLOW, player)
+        screen.blit(player,player_rect)
 
         # コインの位置を更新
         for coin in coins:
@@ -58,18 +66,18 @@ def main():
             pg.draw.ellipse(screen, YELLOW, coin)
 
             # 衝突検出
-            if player.colliderect(coin):
+            if player_rect.colliderect(coin):
                 coins.remove(coin)
                 score += 1
 
             # コインを再生する
-            if coin.y > HEIGHT:
+            if coin.y > 100:
                 coin.x = random.randint(0, WIDTH - 50)
                 coin.y = random.randint(-HEIGHT, -50)
 
         # スコア
         font = pg.font.Font(None, 36)
-        text = font.render("Score: " + str(score), True, YELLOW)
+        text = font.render("Score: " + str(score), True, BLACK)
         screen.blit(text, (10, 10))
 
         pg.display.flip()
