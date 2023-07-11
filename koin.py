@@ -21,7 +21,9 @@ def main():
     player_x = 400
     player_y = 500
 
-    # player
+    #test
+
+    # player　画像に変更
     player = pg.image.load("ex05/usi.png")
     player_rect = player.get_rect()
     player_rect.center = (player_x,player_y)
@@ -43,7 +45,7 @@ def main():
             if event.type == pg.QUIT:
                 return 0
 
-        # player移動
+        # player移動 壁を通り過ぎないように
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT]:
             if player_rect.left > 0:
@@ -71,7 +73,7 @@ def main():
                 score += 1
 
             # コインを再生する
-            if coin.y > 100:
+            if coin.y > HEIGHT:
                 coin.x = random.randint(0, WIDTH - 50)
                 coin.y = random.randint(-HEIGHT, -50)
 
