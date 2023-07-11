@@ -6,7 +6,29 @@ WIDTH = 800  # ゲームウィンドウの幅
 HEIGHT = 600  # ゲームウィンドウの高さ
 
 
+class Time:
+    """
+    時間の管理を行うクラス
+    """
+    def __init__(self):
+        self.font = pg.font.Font(None, 36)
+        self.color = (125, 125, 125)
+        self.tmr = 60
+        self.image = self.font.render("Time: " + str(self.tmr), True, self.color)
+        self.rect = self.image.get_rect()
+        self.rect.center = 60, 50
+    
+    def time_subtract(self):
+        self.tmr -= 1  #timeを-1する。
+
+    def update(self, screen: pg.Surface):
+        self.image = self.font.render("Time: " + str(self.tmr), True, self.color)
+        screen.blit(self.image, self.rect)
+
 def main():
+    clock = pg.time.Clock()
+    frame_count = 0  #フレーム数をカウントする為の変数
+    time = Time()
 
     # 色
     WHITE = (255, 255, 255)
@@ -36,10 +58,13 @@ def main():
 
     # main循環
     while True:
-        
+
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return 0
+        #Timeが0になったらゲーム終了
+        if time.tmr == 0:
+            return False
 
         # player移動
         keys = pg.key.get_pressed()
@@ -72,7 +97,13 @@ def main():
         text = font.render("Score: " + str(score), True, YELLOW)
         screen.blit(text, (10, 10))
 
+        frame_count += 1  
+        time.update(screen)  
         pg.display.flip()
+        #timeを200フレームごとに-1する。
+        if frame_count % 200 == 0:
+            time.time_subtract() 
+        clock.tick(200)
 
 
 if __name__ == "__main__":
