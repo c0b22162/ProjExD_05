@@ -8,7 +8,29 @@ WIDTH = 800
 # ゲームウィンドウの高さ
 HEIGHT = 600
 
+class Time:
+    """
+    時間の管理を行うクラス
+    """
+    def __init__(self):
+        self.font = pg.font.Font(None, 36)
+        self.color = (125, 125, 125)
+        self.tmr = 60
+        self.image = self.font.render("Time: " + str(self.tmr), True, self.color)
+        self.rect = self.image.get_rect()
+        self.rect.center = 60, 50
+    
+    def time_subtract(self):
+        self.tmr -= 1  #timeを-1する。
+
+    def update(self, screen: pg.Surface):
+        self.image = self.font.render("Time: " + str(self.tmr), True, self.color)
+        screen.blit(self.image, self.rect)
+
 def main():
+    clock = pg.time.Clock()
+    frame_count = 0  #フレーム数をカウントする為の変数
+    time = Time()
 
     # 色の設定
     WHITE = (255, 255, 255)
@@ -69,7 +91,7 @@ def main():
 
     # main循環
     while True:
-        
+
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return 0
@@ -84,6 +106,10 @@ def main():
                         wall = pg.Rect(player_rect.left, player_rect.top - 25, player_rect.width, 25)
                         wall_exists = True
 
+        #Timeが0になったらゲーム終了
+        if time.tmr == 0:
+            return False
+        
         # player移動 壁を通り過ぎないように
         # playerの移動と移動速度
         keys = pg.key.get_pressed()
@@ -174,6 +200,14 @@ def main():
             y = random.randint(-HEIGHT, -50)
             super_coin = pg.Rect(x, y, 25, 25)
             super_coins.append(super_coin)
+
+        frame_count += 1  
+        time.update(screen)  
+        pg.display.flip()
+        #timeを200フレームごとに-1する。
+        if frame_count % 200 == 0:
+            time.time_subtract() 
+        clock.tick(8000)
 
         pg.display.flip()
 
