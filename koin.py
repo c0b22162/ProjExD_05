@@ -1,5 +1,4 @@
 import pygame as pg
-from pygame import image #追加背景
 import random
 import sys
 
@@ -27,6 +26,7 @@ class Time:
         self.image = self.font.render("Time: " + str(self.tmr), True, self.color)
         screen.blit(self.image, self.rect)
 
+
 def main():
     clock = pg.time.Clock()
     frame_count = 0  #フレーム数をカウントする為の変数
@@ -39,12 +39,13 @@ def main():
     RED = (255, 0, 0)
     BLACK = (0, 0, 0)
 
+
     # ウィンドウを作る
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     # ゲームの名前
     pg.display.set_caption("coin getter")
-    #追加機能　背景画像読み込み
-    background_image = image.load('ex05/haikei1.jpg')
+    # 追加機能 背景画像読み込み
+    background_image = pg.image.load("ex05/haikei1.jpg")
 
     # player初期位置
     # playerの初期位置と大きさ
@@ -77,6 +78,7 @@ def main():
         coin = pg.Rect(x, y, 50, 50)
         coins.append(coin)
 
+
     #スーパーコインを3個を入れる
     for j in range(3):
         # スーパーコインの生成位置をランダムにする
@@ -85,6 +87,14 @@ def main():
         y = random.randint(-HEIGHT, -50)
         super_coin = pg.Rect(x, y, 25, 25)
         super_coins.append(super_coin)
+
+   # 爆弾を作る 
+    bombs = []
+    for i in range(4):
+        x = random.randint(0, WIDTH - 50)
+        y = random.randint(-HEIGHT, -50)
+        bomb = pg.Rect(x, y, 30, 30)
+        bombs.append(bomb)
 
     # スコア初期値
     score = 0
@@ -131,7 +141,6 @@ def main():
 
         screen.blit(background_image,(0,0))
 
-
         # コインの位置を更新
         for coin in coins:
             # コインを上から落ちることにする
@@ -150,9 +159,24 @@ def main():
                 coin.x = random.randint(0, WIDTH - 50)
                 coin.y = random.randint(-HEIGHT, -50)
 
+
         # playerをウィンドウに描画
         screen.blit(player,player_rect)
         
+        for bomb in bombs:
+            bomb.y += 1
+            pg.draw.ellipse(screen, RED, bomb)
+
+            # 衝突検出
+            if player_rect.colliderect(bomb):
+                bombs.remove(bomb)
+                pg.quit()
+
+            # 爆弾を再生する
+            if bomb.y > HEIGHT:
+                bomb.x = random.randint(0, WIDTH - 50)
+                bomb.y = random.randint(-HEIGHT, -50)
+
         # スコア
         # スーパーコインの位置の更新
         for super_coin in super_coins:
