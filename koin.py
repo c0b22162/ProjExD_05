@@ -2,9 +2,8 @@ import pygame as pg
 import random
 import sys
 
-# ゲームウィンドウの幅
+# ゲームウィンドウの幅と高さ
 WIDTH = 800
-# ゲームウィンドウの高さ
 HEIGHT = 600
 
 class Time:
